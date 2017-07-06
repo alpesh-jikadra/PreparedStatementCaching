@@ -16,6 +16,7 @@ public class Example {
 	@BeforeClass
 	public static void setupAll(){
 		jdbcTemplate = new JdbcTemplate((DataSource) context.getBean("dataSource"));
+		//addDummyEntry();
 		
 	}
 	 
@@ -26,7 +27,7 @@ public class Example {
 		}
 	}
 	@Test
-	public void forNewProductInsert() throws Exception {
+	public void simpleTest() throws Exception {
 		ExampleDAO dao= (ExampleDAO) context.getBean("exampleDAO");
 		boolean insertNew = true;
 		if(insertNew){
