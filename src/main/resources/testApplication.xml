@@ -1,0 +1,76 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+
+	<bean class="org.apache.commons.dbcp.BasicDataSource" id="dataSource">
+	   <property name="driverClassName">
+			<value>com.mysql.jdbc.Driver</value>
+		</property>
+		<property name="url">
+			<value>jdbc:mysql://localhost:3307/temp?useOldAliasMetadataBehavior=true&amp;useSSL=false</value>
+		</property>
+		<property name="username">
+			<value>root</value>
+		</property>
+		<property name="password">
+			<value>root</value>
+		</property>
+		<property name="maxActive">
+			<value>250</value>
+		</property>
+  	</bean>
+	<bean class="org.springframework.orm.hibernate3.LocalSessionFactoryBean"
+		id="sessionFactory">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="configLocation">
+			<value>hibernate.cfg.xml</value>
+		</property>
+	</bean>
+	
+	
+	<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean" id="abstractTransactionFactoryBean" abstract="true">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="save*">PROPAGATION_REQUIRED,-BusinessServiceException</prop>
+				<prop key="delete*">PROPAGATION_REQUIRED</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED</prop>
+				<prop key="*">PROPAGATION_REQUIRED,-BusinessServiceException</prop>
+			</props>
+		</property>
+	</bean>
+	
+
+	<bean class="org.springframework.orm.hibernate3.HibernateTransactionManager" id="transactionManager">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory"/>
+		</property>
+    </bean>
+
+
+	<bean id="abstractDaoTarget" class="com.example.GenericDaoHibernateImpl" abstract="true">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+ 	 </bean>
+ 	 
+   <bean id="exampleDAO" parent="abstractTransactionFactoryBean">
+		<property name="target">
+			<bean class="com.example.ExampleDAO"
+				parent="abstractDaoTarget">
+				<constructor-arg>
+					<value>java.lang.Object</value>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+    
+    
+  
+</beans>
